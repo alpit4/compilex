@@ -42,3 +42,26 @@ export const onboardUser = async () => {
     };
   }
 };
+
+export const currentUserRole = async () => {
+  try {
+    const user = await currentUser();
+    if (!user) {
+      return { success: false, error: "User not found" };
+    }
+    const { id } = user;
+    const userRole = await db.user.findUnique({
+      where: {
+        clerkId: id,
+      },
+      select: {
+        role: true,
+      },
+    });
+
+    return userRole.role;
+  } catch (error) {
+    console.error("Failed to get current user role", error);
+    return { success: false, error: "Failed to get current user role" };
+  }
+};
