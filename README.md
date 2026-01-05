@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Compilex 🚀
 
-## Getting Started
+**Compilex** is a modern, high-performance coding platform designed to provide a seamless competitive programming and problem-solving experience. Developed with the latest web technologies, it offers a robust environment for developers to hone their skills.
 
-First, run the development server:
+> [!IMPORTANT]
+> **Work in Progress:** This project is currently under active development. Many features are being implemented and refined. Stay tuned for frequent updates! 🏗️
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
+
+## ✨ Features
+
+- **🔐 Secure Authentication:** Integrated with Clerk for seamless and secure user management.
+- **🚀 Onboarding Flow:** Automated user onboarding and database synchronization.
+- **🎨 Modern UI/UX:** Built with Tailwind CSS 4 and Shadcn/UI for a beautiful, responsive, and accessible interface.
+- **🌓 Dark Mode:** Built-in theme switching support.
+- **📱 Responsive Navbar:** Sleek, glassmorphism-inspired navigation.
+- **🛠️ Role-Based Access:** ADMIN and USER roles for specialized access (Admin dashboard under construction).
+
+---
+
+## 🛠️ Tech Stack
+
+- **Framework:** [Next.js 16 (App Router)](https://nextjs.org/)
+- **Styling:** [Tailwind CSS 4](https://tailwindcss.com/) & [Shadcn/UI](https://ui.shadcn.com/)
+- **Database:** [PostgreSQL](https://www.postgresql.org/)
+- **ORM:** [Prisma](https://www.prisma.io/)
+- **Authentication:** [Clerk](https://clerk.com/)
+- **Language:** JavaScript / React
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (Latest LTS recommended)
+- PostgreSQL database
+- Clerk Account (for Auth keys)
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone <your-repo-url>
+   cd compilex
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Set up Environment Variables:**
+   Create a `.env` file in the root directory and add the necessary keys (Database URL, Clerk keys, etc.).
+
+4. **Run Database Migrations:**
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
+
+5. **Start the development server:**
+   ```bash
+   npm run dev
+   ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛤️ Roadmap
 
-## Learn More
+- [x] Base Project Setup & Auth
+- [x] User Onboarding
+- [x] Responsive Navbar & Theme Toggle
+- [ ] Problem List Page
+- [ ] Individual Problem Solving Dashboard
+- [ ] Code Execution Engine
+- [ ] Admin Dashboard for Problem Creation
+- [ ] User Profiles & Statistics
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*Made with ❤️ by Alpit Kumar*
