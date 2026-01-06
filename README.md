@@ -73,6 +73,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - [x] Base Project Setup & Auth
 - [x] User Onboarding
 - [x] Responsive Navbar & Theme Toggle
+- [x] Role Based Authentication
+- [x] Local Deploy the Judge0 API for Code Execution 
 - [ ] Problem List Page
 - [ ] Individual Problem Solving Dashboard
 - [ ] Code Execution Engine
