@@ -65,3 +65,18 @@ export const currentUserRole = async () => {
     return { success: false, error: "Failed to get current user role" };
   }
 };
+
+export const getCurrentuser = async () => {
+  const user = await currentUser();
+
+  const dbUser = await db.user.findUnique({
+    where: {
+      clerkId: user.id,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  return dbUser;
+};
