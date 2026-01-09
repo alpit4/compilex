@@ -34,7 +34,7 @@
 ### Prerequisites
 
 - Node.js (Latest LTS recommended)
-- PostgreSQL database
+- PostgreSQL database, Prisma ORM
 - Clerk Account (for Auth keys)
 
 ### Installation
@@ -74,7 +74,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - [x] User Onboarding
 - [x] Responsive Navbar & Theme Toggle
 - [x] Role Based Authentication
-- [x] Local Deploy the Judge0 API for Code Execution 
+- [x] Local Deploy the Judge0 API for Code Execution
+- [x] Handled the create Problem API and Problem Schema
 - [ ] Problem List Page
 - [ ] Individual Problem Solving Dashboard
 - [ ] Code Execution Engine
