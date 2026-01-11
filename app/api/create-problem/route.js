@@ -1,9 +1,10 @@
 import { pollBatchResults, submissionBatch } from "@/lib/judge0";
 import { currentUserRole, getCurrentuser } from "@/modules/auth/actions";
-import { currentUser } from "@clerk/nextjs/dist/types/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { UserRole } from "@prisma/client";
 import { NextResponse } from "next/server";
-import { db } from "@/db";
+import { db } from "@/lib/db";
+import { getJudge0LanguageId } from "@/lib/judge0";
 
 export async function POST(request) {
   try {

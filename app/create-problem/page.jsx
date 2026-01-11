@@ -6,6 +6,8 @@ import { ArrowLeft} from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/dist/server/api-utils";
 import React from "react";
+import CreateProblemForm from "@/modules/problems/components/create-problem-form";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 
 const CreateProblemPage = async () => {
     const user = await currentUser();
@@ -24,7 +26,9 @@ const CreateProblemPage = async () => {
                    </Button>
                 </Link>
                 <h1 className="text-3xl font-bold text-indigo-300">Welcome {user?.firstName}! Create a Problem</h1>
+                <ModeToggle />
             </div>
+            <CreateProblemForm />
         </section>
     )
 }
