@@ -76,7 +76,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - [x] Role Based Authentication
 - [x] Local Deploy the Judge0 API for Code Execution
 - [x] Handled the create Problem API and Problem Schema
-- [ ] Problem List Page
+- [x] Problem List Page
 - [ ] Individual Problem Solving Dashboard
 - [ ] Code Execution Engine
 - [ ] Admin Dashboard for Problem Creation
