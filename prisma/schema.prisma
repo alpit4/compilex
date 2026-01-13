@@ -47,9 +47,9 @@ model Problem {
   hints       Json
   editorial   String?
 
-  testCases         Json
-  codeSnippet       Json
-  referenceSolution Json
+  testCases          Json
+  codeSnippet        Json
+  referenceSolutions Json
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

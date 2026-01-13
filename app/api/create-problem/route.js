@@ -24,6 +24,7 @@ export async function POST(request) {
       tags,
       examples,
       constraints,
+      hints,
       testCases,
       codeSnippets,
       referenceSolutions,
@@ -69,31 +70,37 @@ export async function POST(request) {
         );
       }
 
-      const submissions = testCases.map((input, output) => ({
+      const submissions = testCases.map((tc) => ({
         source_code: solutionCode,
         language_id: languageId,
-        stdin: input,
-        expected_output: output,
+        stdin: tc.input,
+        expected_output: tc.output,
       }));
 
       const submissionResult = await submissionBatch(submissions);
-
       const tokens = submissionResult.map((res) => res.token);
-
       const results = await pollBatchResults(tokens);
 
       for (let i = 0; i < results.length; i++) {
         const result = results[i];
+        const expectedOutput = testCases[i].output.trim();
+        const actualOutput = (result.stdout || "").trim();
 
-        if (result.status.id !== 3) {
+        const isInternalError =
+          result.status.id === 13 || result.status.id === 14;
+        const isOutputMismatch =
+          result.status.id === 3 && actualOutput !== expectedOutput;
+
+        if (isOutputMismatch || (result.status.id !== 3 && !isInternalError)) {
           return NextResponse.json(
             {
-              error: "validation failed for ${language}",
+              error: `Validation failed for ${language} on test case ${i + 1}`,
               testCase: {
-                input: submissions[i].stdin,
-                expected_output: submissions[i].expected_output,
-                actualOutput: result.stdout,
-                error: result.stderr || result.compile_output,
+                input: testCases[i].input,
+                expected_output: expectedOutput,
+                actualOutput: actualOutput,
+                status: result.status.description,
+                error: result.stderr || result.compile_output || result.message,
               },
               details: result,
             },
@@ -111,8 +118,9 @@ export async function POST(request) {
         tags,
         examples,
         constraints,
+        hints,
         testCases,
-        codeSnippets,
+        codeSnippet: codeSnippets,
         referenceSolutions,
         userId: user.id,
       },
