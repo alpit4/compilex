@@ -1,6 +1,8 @@
 import React from 'react';
 import { db } from '@/lib/db';
 import { getAllProblems } from '@/modules/problems/actions';
+import { currentUser } from '@clerk/nextjs/server';
+import ProblemsTable from '@/modules/problems/components/problem-table';
 
 const ProblemsPage = async () => {
     const user = await currentUser();
@@ -31,7 +33,7 @@ const ProblemsPage = async () => {
 
     return(
         <div className='container mx-auto py-32'>
-            
+            <ProblemsTable problems={problems} user={dbUser}/>
         </div>
     )
 }

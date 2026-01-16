@@ -1,16 +1,15 @@
+"use server";
+
 import { db } from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
 import { currentUserRole } from "@/modules/auth/actions";
 import { UserRole } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export const getAllProblems = async () => {
   try {
     const user = await currentUser();
     const userRole = await currentUserRole();
-
-    if (userRole !== userRole.ADMIN) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
 
     const data = await db.user.findUnique({
       where: {
@@ -37,7 +36,7 @@ export const getAllProblems = async () => {
     return { success: true, data: problems };
   } catch (error) {
     console.error("Failed to get all problems", error);
-    return { success: false, error: error.message };
+    return { success: false, error: "Failed to fetch problems" };
   }
 };
 
@@ -49,17 +48,10 @@ export const getProblemById = async (id) => {
       },
     });
 
-    if (!problem) {
-      return NextResponse.json(
-        { message: "Problem not found" },
-        { status: 404 }
-      );
-    }
-
     return { success: true, data: problem };
   } catch (error) {
     console.error("Failed to get problem by id", error);
-    return { success: false, error: error.message };
+    return { success: false, error: "Failed to fetch problem" };
   }
 };
 
@@ -68,7 +60,7 @@ export const deleteProblem = async (problemId) => {
     const user = await currentUser();
 
     if (!user) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      throw new Error("Unauthorized");
     }
 
     const dbUser = await db.user.findUnique({
@@ -81,16 +73,17 @@ export const deleteProblem = async (problemId) => {
     });
 
     if (dbUser?.role !== UserRole.ADMIN) {
-      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      throw new Error("Only admins can delete problems");
     }
 
-    const problem = await db.problem.delete({
+    await db.problem.delete({
       where: {
         id: problemId,
       },
     });
 
-    return { success: true, data: problem };
+    revalidatePath("/problems");
+    return { success: true, message: "Problem deleted successfully" };
   } catch (error) {
     console.error("Failed to delete problem by id", error);
     return { success: false, error: error.message };
