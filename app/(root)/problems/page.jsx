@@ -11,7 +11,7 @@ const ProblemsPage = async () => {
     if(user){
         dbUser = await db.user.findUnique({
             where:{
-                id: user.id
+                clerkId: user.id
             },
             select:{
                 id: true,

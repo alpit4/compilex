@@ -9,24 +9,28 @@ import { revalidatePath } from "next/cache";
 export const getAllProblems = async () => {
   try {
     const user = await currentUser();
-    const userRole = await currentUserRole();
 
-    const data = await db.user.findUnique({
-      where: {
-        clerkId: user.id,
-      },
-      select: {
-        id: true,
-      },
-    });
+    let dbUser = null;
+    if (user) {
+      dbUser = await db.user.findUnique({
+        where: {
+          clerkId: user.id,
+        },
+        select: {
+          id: true,
+        },
+      });
+    }
 
     const problems = await db.problem.findMany({
       include: {
-        solvedBy: {
-          where: {
-            userId: data.id,
-          },
-        },
+        solvedBy: dbUser
+          ? {
+              where: {
+                userId: dbUser.id,
+              },
+            }
+          : false,
       },
       orderBy: {
         createdAt: "desc",
