@@ -1,6 +1,5 @@
 import { pollBatchResults, submissionBatch } from "@/lib/judge0";
 import { currentUserRole, getCurrentuser } from "@/modules/auth/actions";
-import { currentUser } from "@clerk/nextjs/server";
 import { UserRole } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
@@ -28,6 +27,7 @@ export async function POST(request) {
       testCases,
       codeSnippets,
       referenceSolutions,
+      editorial,
     } = body;
 
     // Basic Validation
@@ -41,7 +41,7 @@ export async function POST(request) {
     ) {
       return NextResponse.json(
         { message: "All fields are required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -49,14 +49,14 @@ export async function POST(request) {
     if (!Array.isArray(testCases) || testCases.length === 0) {
       return NextResponse.json(
         { message: "Atleast one test case is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     if (!referenceSolutions || typeof referenceSolutions !== "object") {
       return NextResponse.json(
         { message: "Reference solutions is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -66,7 +66,7 @@ export async function POST(request) {
       if (!languageId) {
         return NextResponse.json(
           { message: "Invalid language" },
-          { status: 400 }
+          { status: 400 },
         );
       }
 
@@ -104,7 +104,7 @@ export async function POST(request) {
               },
               details: result,
             },
-            { status: 400 }
+            { status: 400 },
           );
         }
       }
@@ -117,6 +117,7 @@ export async function POST(request) {
         difficulty,
         tags,
         examples,
+        editorial,
         constraints,
         hints,
         testCases,
@@ -132,7 +133,7 @@ export async function POST(request) {
         data: newProblem,
         message: "Problem created successfully",
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Failed to create problem", error);
@@ -141,7 +142,7 @@ export async function POST(request) {
         success: false,
         error: error.message,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

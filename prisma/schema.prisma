@@ -7,56 +7,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  ADMIN
-  USER
-}
-
 model User {
-  id        String   @id @default(uuid())
-  clerkId   String   @unique
-  email     String   @unique
-  role      UserRole @default(USER)
-  firstName String?
-  lastName  String?
-  imageUrl  String?
-
+  id             String          @id @default(uuid())
+  email          String          @unique
+  clerkId        String          @unique
+  createdAt      DateTime        @default(now())
+  firstName      String?
+  imageUrl       String?
+  lastName       String?
+  role           UserRole        @default(USER)
+  updatedAt      DateTime        @updatedAt
   problems       Problem[]
   solvedProblems ProblemSolved[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
 
   @@index([role])
 }
 
-enum Difficulty {
-  EASY
-  MEDIUM
-  HARD
-}
-
 model Problem {
-  id          String     @id @default(uuid())
-  title       String
-  description String
-  difficulty  Difficulty
-  tags        String[]
-
-  userId      String
-  examples    Json
-  constraints Json
-  hints       Json
-  editorial   String?
-
+  id                 String          @id @default(uuid())
+  title              String
+  description        String
+  difficulty         Difficulty
+  tags               String[]
+  userId             String
+  examples           Json
+  constraints        Json
+  hints              Json
+  editorial          String?
   testCases          Json
   codeSnippet        Json
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
   referenceSolutions Json
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user     User            @relation(fields: [userId], references: [id], onDelete: Cascade)
-  solvedBy ProblemSolved[]
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  solvedBy           ProblemSolved[]
 
   @@index([difficulty])
 }
@@ -66,9 +50,19 @@ model ProblemSolved {
   userId    String
   problemId String
   createdAt DateTime @default(now())
-
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, problemId])
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
 }
