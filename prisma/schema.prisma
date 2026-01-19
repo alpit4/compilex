@@ -19,8 +19,33 @@ model User {
   updatedAt      DateTime        @updatedAt
   problems       Problem[]
   solvedProblems ProblemSolved[]
+  submissions    Submission[]
 
   @@index([role])
+}
+
+model Submission {
+  id            String  @id @default(uuid())
+  userId        String
+  problemId     String
+  sourceCode    Json
+  language      String
+  stdin         String?
+  stdout        String?
+  stderr        String?
+  compileOutput String?
+  status        String
+  memory        String?
+  time          String?
+
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+
+  testCases TestCaseResult[]
+
+  @@index([status])
 }
 
 model Problem {
@@ -31,8 +56,8 @@ model Problem {
   tags               String[]
   userId             String
   examples           Json
-  constraints        Json
-  hints              Json
+  constraints        String
+  hints              String?
   editorial          String?
   testCases          Json
   codeSnippet        Json
@@ -41,8 +66,29 @@ model Problem {
   referenceSolutions Json
   user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   solvedBy           ProblemSolved[]
+  submissions        Submission[]
 
   @@index([difficulty])
+}
+
+model TestCaseResult {
+  id            String  @id @default(uuid())
+  submissionId  String
+  testCase      Int
+  passed        Boolean
+  stdout        String?
+  expected      String
+  stderr        String?
+  compileOutput String?
+  status        String
+  time          String?
+  memory        String?
+
+  createdAt DateTime @default(now())
+
+  submission Submission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+
+  @@index([submissionId])
 }
 
 model ProblemSolved {
@@ -50,8 +96,9 @@ model ProblemSolved {
   userId    String
   problemId String
   createdAt DateTime @default(now())
-  problem   Problem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  problem Problem @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, problemId])
 }

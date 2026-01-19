@@ -4,7 +4,6 @@ import { useTheme } from "next-themes";
 import Editor from "@monaco-editor/react";
 
 import { Badge } from "@/components/ui/badge";
-import { getProblemById } from "@/modules/problems/actions";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -39,6 +38,7 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { getJudge0LanguageId } from "@/lib/judge0";
 import { toast } from "sonner";
 import Link from "next/link";
+import { getProblemById } from "@/modules/problems/actions";
 
 const getDifficultyColor = (difficulty) => {
   switch (difficulty) {
@@ -70,11 +70,10 @@ const ProblemIdPage = ({ params }) => {
         const resolvedParams = await params;
         const problemData = await getProblemById(resolvedParams.id);
         if (problemData.success) {
-          //   console.log(problemData.data);
+          console.log(problemData.data);
           setProblem(problemData.data);
-          if (problemData.data?.codeSnippets?.[selectedLanguage]) {
-            setCode(problemData.data.codeSnippets[selectedLanguage]);
-          }
+
+          setCode(problemData.data.codeSnippet?.[selectedLanguage] || "");
         }
       } catch (error) {
         console.error("Error fetching problem:", error);
@@ -82,7 +81,41 @@ const ProblemIdPage = ({ params }) => {
     };
 
     fetchProblem();
-  }, [params, selectedLanguage]);
+  }, [params]);
+
+  useEffect(() => {
+    if (problem && problem.codeSnippet?.[selectedLanguage]) {
+      setCode(problem.codeSnippet[selectedLanguage]);
+    }
+  }, [selectedLanguage, problem]);
+
+  const handleRun = async () => {
+    try {
+      setIsRunning(true);
+      const language_id = getJudge0LanguageId(selectedLanguage);
+      const stdin = problem.testCases.map((tc) => tc.input);
+      const expected_outputs = problem.testCases.map((tc) => tc.output);
+      const res = await executeCode(
+        code,
+        language_id,
+        stdin,
+        expected_outputs,
+        problem.id,
+      );
+
+      setExecutionResponse(res);
+      if (res.success) {
+        toast.success(res.message);
+      }
+    } catch (error) {
+      console.error("Error running code:", error);
+      toast.error(error.message);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  const handleSubmit = () => {};
 
   if (!problem) {
     return (
@@ -143,7 +176,7 @@ const ProblemIdPage = ({ params }) => {
                   {/* Examples */}
                   <div>
                     <h3 className="font-semibold text-lg mb-3">Example:</h3>
-                    {problem?.examples[selectedLanguage] && (
+                    {problem?.examples?.[selectedLanguage] && (
                       <div className="bg-muted p-4 rounded-lg space-y-2">
                         <div>
                           <span className="font-medium text-indigo-400">
@@ -282,11 +315,17 @@ const ProblemIdPage = ({ params }) => {
                   />
                 </div>
                 <div className="flex gap-3 mt-4">
-                  <Button variant="outline" className="flex items-center gap-2">
+                  <Button
+                    onClick={handleRun}
+                    disabled={isRunning}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
                     <Play className="h-4 w-4" />
                     {isRunning ? "Running..." : "Run"}
                   </Button>
                   <Button
+                    onClick={handleSubmit}
                     disabled={isSubmitting}
                     className="flex items-center gap-2"
                   >
