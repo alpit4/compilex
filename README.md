@@ -77,8 +77,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - [x] Local Deploy the Judge0 API for Code Execution
 - [x] Handled the create Problem API and Problem Schema
 - [x] Problem List Page
-- [ ] Individual Problem Solving Dashboard
-- [ ] Code Execution Engine
+- [x] Individual Problem Solving Dashboard
+- [x] Code Execution Engine
 - [ ] Admin Dashboard for Problem Creation
 - [ ] User Profiles & Statistics
 
