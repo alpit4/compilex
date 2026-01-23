@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import Editor from "@monaco-editor/react";
+import { CodeEditor, Language } from "@patternfly/react-code-editor";
+import "@patternfly/react-core/dist/styles/base-no-reset.css";
+import "@patternfly/react-styles/css/components/CodeEditor/code-editor.css";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -291,26 +293,25 @@ const ProblemIdPage = ({ params }) => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="border rounded-lg overflow-hidden">
-                  <Editor
+                <div className="border rounded-lg overflow-hidden mb-4">
+                  <CodeEditor
                     height="400px"
                     language={
                       selectedLanguage.toLowerCase() === "javascript"
-                        ? "javascript"
-                        : selectedLanguage.toLowerCase()
+                        ? Language.javascript
+                        : selectedLanguage.toLowerCase() === "python"
+                          ? Language.python
+                          : Language.java
                     }
                     value={code}
                     onChange={(value) => setCode(value || "")}
-                    theme={theme === "dark" ? "vs-dark" : "light"}
+                    isLineNumbersVisible
+                    isReadOnly={false}
+                    showEditor={true}
                     options={{
-                      minimap: { enabled: false },
                       fontSize: 16,
-                      lineNumbers: "on",
-                      roundedSelection: false,
-                      scrollBeyondLastLine: false,
+                      minimap: { enabled: false },
                       automaticLayout: true,
-                      tabSize: 2,
-                      wordWrap: "on",
                     }}
                   />
                 </div>
