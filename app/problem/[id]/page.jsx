@@ -1,9 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
-import { CodeEditor, Language } from "@patternfly/react-code-editor";
-import "@patternfly/react-core/dist/styles/base-no-reset.css";
-import "@patternfly/react-styles/css/components/CodeEditor/code-editor.css";
+import Editor from "@monaco-editor/react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -40,7 +38,14 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { getJudge0LanguageId } from "@/lib/judge0";
 import { toast } from "sonner";
 import Link from "next/link";
-import { getProblemById } from "@/modules/problems/actions";
+import {
+  executeCode,
+  getAllSubmissionByCurrentUserForProblem,
+  getProblemById,
+} from "@/modules/problems/actions";
+import { SubmissionDetails } from "@/modules/problems/components/submission-details";
+import { TestCaseTable } from "@/modules/problems/components/test-case-table";
+import { SubmissionHistory } from "@/modules/problems/components/submission-history";
 
 const getDifficultyColor = (difficulty) => {
   switch (difficulty) {
@@ -75,7 +80,7 @@ const ProblemIdPage = ({ params }) => {
           console.log(problemData.data);
           setProblem(problemData.data);
 
-          setCode(problemData.data.codeSnippet?.[selectedLanguage] || "");
+          setCode(problemData.data.codeSnippets[selectedLanguage] || "");
         }
       } catch (error) {
         console.error("Error fetching problem:", error);
@@ -86,8 +91,27 @@ const ProblemIdPage = ({ params }) => {
   }, [params]);
 
   useEffect(() => {
-    if (problem && problem.codeSnippet?.[selectedLanguage]) {
-      setCode(problem.codeSnippet[selectedLanguage]);
+    const fetchSubmissionHistory = async () => {
+      try {
+        const resolvedParams = await params;
+        const submissionHistory = await getAllSubmissionByCurrentUserForProblem(
+          resolvedParams.id,
+        );
+        console.log(submissionHistory);
+        if (submissionHistory.success) {
+          setSubmissionHistory(submissionHistory.data);
+        }
+      } catch (error) {
+        console.error("Error fetching problem:", error);
+      }
+    };
+
+    fetchSubmissionHistory();
+  }, [params]);
+
+  useEffect(() => {
+    if (problem && problem.codeSnippets[selectedLanguage]) {
+      setCode(problem.codeSnippets[selectedLanguage]);
     }
   }, [selectedLanguage, problem]);
 
@@ -122,7 +146,7 @@ const ProblemIdPage = ({ params }) => {
   if (!problem) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
-        <Loader2 className="animate-spin size-5 text-indigo-400" />
+        <Loader2 className="animate-spin size-5 text-amber-400" />
       </div>
     );
   }
@@ -178,10 +202,10 @@ const ProblemIdPage = ({ params }) => {
                   {/* Examples */}
                   <div>
                     <h3 className="font-semibold text-lg mb-3">Example:</h3>
-                    {problem?.examples?.[selectedLanguage] && (
+                    {problem?.examples[selectedLanguage] && (
                       <div className="bg-muted p-4 rounded-lg space-y-2">
                         <div>
-                          <span className="font-medium text-indigo-400">
+                          <span className="font-medium text-amber-400">
                             Input:{" "}
                           </span>
                           <code className="text-sm dark:bg-zinc-900 bg-zinc-200 text-zinc-900 dark:text-zinc-200 px-2 py-1 rounded">
@@ -189,7 +213,7 @@ const ProblemIdPage = ({ params }) => {
                           </code>
                         </div>
                         <div>
-                          <span className="font-medium text-indigo-400">
+                          <span className="font-medium text-amber-400">
                             Output:{" "}
                           </span>
                           <code className="text-sm dark:bg-zinc-900 bg-zinc-200 text-zinc-900 dark:text-zinc-200 px-2 py-1 rounded">
@@ -248,6 +272,7 @@ const ProblemIdPage = ({ params }) => {
                   <TabsContent value="submissions" className="p-6">
                     <div className="text-center py-8 text-muted-foreground">
                       <p>Submission History</p>
+                      <SubmissionHistory submissions={submissionHistory} />
                     </div>
                   </TabsContent>
                   <TabsContent value="editorial" className="p-6">
@@ -293,25 +318,26 @@ const ProblemIdPage = ({ params }) => {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="border rounded-lg overflow-hidden mb-4">
-                  <CodeEditor
+                <div className="border rounded-lg overflow-hidden">
+                  <Editor
                     height="400px"
                     language={
                       selectedLanguage.toLowerCase() === "javascript"
-                        ? Language.javascript
-                        : selectedLanguage.toLowerCase() === "python"
-                          ? Language.python
-                          : Language.java
+                        ? "javascript"
+                        : selectedLanguage.toLowerCase()
                     }
                     value={code}
                     onChange={(value) => setCode(value || "")}
-                    isLineNumbersVisible
-                    isReadOnly={false}
-                    showEditor={true}
+                    theme={theme === "dark" ? "vs-dark" : "light"}
                     options={{
-                      fontSize: 16,
                       minimap: { enabled: false },
+                      fontSize: 16,
+                      lineNumbers: "on",
+                      roundedSelection: false,
+                      scrollBeyondLastLine: false,
                       automaticLayout: true,
+                      tabSize: 2,
+                      wordWrap: "on",
                     }}
                   />
                 </div>
@@ -376,6 +402,16 @@ const ProblemIdPage = ({ params }) => {
                 </ScrollArea>
               </CardContent>
             </Card>
+
+            {/* Test Results and Submission Details */}
+            {executionResponse && executionResponse.submission && (
+              <div className="space-y-4 mt-4">
+                <SubmissionDetails submission={executionResponse.submission} />
+                <TestCaseTable
+                  testCases={executionResponse.submission.testCases}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
